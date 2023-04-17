@@ -78,8 +78,21 @@ pub fn test_add_i64() -> String {
 
     let mut result_text = String::new();
     for (a, b) in pairs {
-        let wasm_result = add_i64.call(&mut store, a, b).expect("should call add_i64");
+        let wasm_result = add_i64.call(&mut store, a, b);
         let compare_result = a.wrapping_add(b);
+
+        let wasm_result = match wasm_result {
+            Ok(value) => value,
+            Err(err) => {
+                write!(
+                    result_text,
+                    "ERR: calling {} + {} should give {}, but it gave error instead:\n{:?}\n\n",
+                    a, b, compare_result, err
+                )
+                .expect("writing to string is infallible");
+                continue;
+            }
+        };
 
         if wasm_result == compare_result {
             write!(result_text, "OK: {} + {} = {}\n", a, b, compare_result)
