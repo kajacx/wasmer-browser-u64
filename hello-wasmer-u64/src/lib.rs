@@ -12,6 +12,8 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn test_add_i32() -> String {
+    console_error_panic_hook::set_once();
+
     let mut store = create_store();
     let instance = create_instance(&mut store);
 
@@ -53,6 +55,8 @@ pub fn test_add_i32() -> String {
 
 #[wasm_bindgen]
 pub fn test_add_i64() -> String {
+    console_error_panic_hook::set_once();
+
     let mut store = create_store();
     let instance = create_instance(&mut store);
 
