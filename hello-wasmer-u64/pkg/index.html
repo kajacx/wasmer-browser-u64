@@ -7,10 +7,9 @@
   </head>
   <body>
     <script type="module">
-      import init, { greet, give_string } from "/hello_wasmer_u64.js";
+      import init, { test_add_i32 } from "/hello_wasmer_u64.js";
       init().then(() => {
-        greet("WebAssembly");
-        alert(give_string());
+        alert(test_add_i32());
       });
     </script>
   </body>
