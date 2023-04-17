@@ -51,6 +51,47 @@ pub fn test_add_i32() -> String {
     result_text
 }
 
+#[wasm_bindgen]
+pub fn test_add_i64() -> String {
+    let mut store = create_store();
+    let instance = create_instance(&mut store);
+
+    let add_i64 = instance
+        .exports
+        .get_typed_function::<(i64, i64), i64>(&store, "add_i64")
+        .expect("should get add_i64 export");
+
+    let pairs = [
+        (5, 10),
+        (5, -10),
+        (i64::MAX - 5, 10),
+        (i64::MIN + 5, -10),
+        (-5, 10),
+        (-5, -10),
+        (i64::MAX - 15, 10),
+        (i64::MIN + 15, -10),
+    ];
+
+    let mut result_text = String::new();
+    for (a, b) in pairs {
+        let wasm_result = add_i64.call(&mut store, a, b).expect("should call add_i64");
+        let compare_result = a.wrapping_add(b);
+
+        if wasm_result == compare_result {
+            write!(result_text, "OK: {} + {} = {}\n", a, b, compare_result)
+                .expect("writing to string is infallible");
+        } else {
+            write!(
+                result_text,
+                "ERR: {} + {} should be {}, but got {} instead\n",
+                a, b, compare_result, wasm_result
+            )
+            .expect("writing to string is infallible");
+        }
+    }
+    result_text
+}
+
 fn create_store() -> Store {
     Store::new()
 }

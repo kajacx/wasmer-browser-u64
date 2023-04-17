@@ -7,9 +7,10 @@
   </head>
   <body>
     <script type="module">
-      import init, { test_add_i32 } from "/hello_wasmer_u64.js";
+      import init, { test_add_i32, test_add_i64 } from "/hello_wasmer_u64.js";
       init().then(() => {
         alert(test_add_i32());
+        alert(test_add_i64());
       });
     </script>
   </body>
