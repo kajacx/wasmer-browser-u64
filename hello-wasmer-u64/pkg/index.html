@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wasmer u64 example</title>
+    <base href="." />
+  </head>
+  <body>
+    <script type="module">
+      import init, { greet } from "/hello_wasmer_u64.js";
+      init().then(() => {
+        greet("WebAssembly");
+      });
+    </script>
+  </body>
+</html>
