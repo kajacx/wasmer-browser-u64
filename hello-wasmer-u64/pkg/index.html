@@ -10,7 +10,14 @@
       import init, { test_add_i32, test_add_i64 } from "/hello_wasmer_u64.js";
       init().then(() => {
         alert(test_add_i32());
-        alert(test_add_i64());
+        try {
+          alert(test_add_i64());
+        } catch (ex) {
+          alert(
+            "Oh no, calling 'test_add_i64' crashed, see the console for more info"
+          );
+          console.error(ex);
+        }
       });
     </script>
   </body>
