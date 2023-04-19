@@ -12,10 +12,7 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn test_add_i32() -> String {
-    console_error_panic_hook::set_once();
-
-    let mut store = create_store();
-    let instance = create_instance(&mut store);
+    let (mut store, instance) = instantiate();
 
     let add_i32 = instance
         .exports
@@ -55,10 +52,7 @@ pub fn test_add_i32() -> String {
 
 #[wasm_bindgen]
 pub fn test_add_i64() -> String {
-    console_error_panic_hook::set_once();
-
-    let mut store = create_store();
-    let instance = create_instance(&mut store);
+    let (mut store, instance) = instantiate();
 
     let add_i64 = instance
         .exports
@@ -109,14 +103,17 @@ pub fn test_add_i64() -> String {
     result_text
 }
 
-fn create_store() -> Store {
-    // Store::new()
-    Store::new(Engine::default())
-}
+fn instantiate() -> (Store, Instance) {
+    console_error_panic_hook::set_once();
 
-fn create_instance(store: &mut Store) -> Instance {
+    // let mut store = Store::new()
+    let mut store = Store::default();
+
     let module = Module::new(&store, PLUGIN_BYTES).expect("should load module");
 
     let import_object = imports! {};
-    Instance::new(store, &module, &import_object).expect("should create instance")
+    let instance =
+        Instance::new(&mut store, &module, &import_object).expect("should create instance");
+
+    (store, instance)
 }
