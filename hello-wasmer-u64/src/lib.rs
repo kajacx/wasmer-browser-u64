@@ -121,6 +121,7 @@ pub fn test_is_even_i64(value: i64) -> bool {
 #[wasm_bindgen]
 pub fn test_combine_to_i64(upper: i32, lower: i32) -> i64 {
     let (mut store, instance) = instantiate();
+    // alert(&format!("{} + {}", upper, lower));
 
     let combine_to_i64 = instance
         .exports

@@ -15,11 +15,11 @@
       } from "/hello_wasmer_u64.js";
 
       init().then(() => {
-        alert(test_add_i32());
+        console.log(test_add_i32());
         try {
-          alert(test_add_i64());
+          console.log(test_add_i64());
         } catch (ex) {
-          alert(
+          console.log(
             "Oh no, calling 'test_add_i64' crashed, see the console for more info"
           );
           console.error(ex);
@@ -36,34 +36,35 @@
         ];
         for (const num of numbers_to_check) {
           try {
-            alert(`${num} is ${test_is_even_i64(num) ? "even" : "odd"}`);
+            console.log(`${num} is ${test_is_even_i64(num) ? "even" : "odd"}`);
           } catch (ex) {
-            alert(`Failed to test if ${num} is even, check the console`);
+            console.log(`Failed to test if ${num} is even, check the console`);
             console.error(ex);
           }
         }
 
-        const numbers_to_combine = [
-          0n,
-          1n,
-          -1n,
-          2_000_000_000n,
-          -2_000_000_000n,
-        ];
+        const numbers_to_combine = [0, 1, -1, 2_000_000_000, -2_000_000_000];
         for (const upper of numbers_to_combine) {
           for (const lower of numbers_to_combine) {
+            const sign = Math.sign(upper) || Math.sign(lower);
+
+            const correctResult =
+              ((BigInt(Math.abs(upper)) * 0x1_00_00_00_00n) |
+                BigInt(Math.abs(lower))) *
+              BigInt(sign);
+
             try {
-              alert(
-                `${upper} combined with ${lower} is ${test_combine_to_i64(
-                  upper,
-                  lower
-                )}`
+              const result = test_combine_to_i64(upper, lower);
+              console.log(
+                `${upper} combined with ${lower} is ${result}, check: ${
+                  result === correctResult
+                }`
               );
             } catch (ex) {
-              alert(
-                `Failed to combine ${upper} and ${lower}, check the console`
+              console.log(
+                `Failed to combine ${upper} and ${lower}, should be ${correctResult}, check the console`
               );
-              console.error(ex);
+              // console.error(ex);
             }
           }
         }
