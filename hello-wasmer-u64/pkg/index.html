@@ -7,7 +7,12 @@
   </head>
   <body>
     <script type="module">
-      import init, { test_add_i32, test_add_i64 } from "/hello_wasmer_u64.js";
+      import init, {
+        test_add_i32,
+        test_add_i64,
+        test_is_even_i64,
+      } from "/hello_wasmer_u64.js";
+
       init().then(() => {
         alert(test_add_i32());
         try {
@@ -17,6 +22,24 @@
             "Oh no, calling 'test_add_i64' crashed, see the console for more info"
           );
           console.error(ex);
+        }
+
+        const numbers_to_check = [
+          0n,
+          1n,
+          -1n,
+          2_000_000_000n,
+          -2_000_000_000n,
+          8_000_000_000_000_000_000n,
+          -8_000_000_000_000_000_000n,
+        ];
+        for (const num of numbers_to_check) {
+          try {
+            alert(`${num} is ${test_is_even_i64(num) ? "even" : "odd"}`);
+          } catch (ex) {
+            alert(`Failed to test id ${num} is even, check the console`);
+            console.error(ex);
+          }
         }
       });
     </script>

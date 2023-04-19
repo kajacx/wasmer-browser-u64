@@ -103,6 +103,21 @@ pub fn test_add_i64() -> String {
     result_text
 }
 
+#[wasm_bindgen]
+pub fn test_is_even_i64(value: i64) -> bool {
+    let (mut store, instance) = instantiate();
+
+    let is_even_i64 = instance
+        .exports
+        .get_typed_function::<i64, u8>(&store, "is_even_i64")
+        .expect("should get is_even_i64 export");
+
+    is_even_i64
+        .call(&mut store, value)
+        .expect("should call is_even_i64")
+        != 0
+}
+
 fn instantiate() -> (Store, Instance) {
     console_error_panic_hook::set_once();
 
