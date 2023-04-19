@@ -26,6 +26,6 @@ pub fn is_even_i64(value: i64) -> bool {
 #[no_mangle]
 pub fn combine_to_i64(upper: i32, lower: i32) -> i64 {
     let upper = (upper as i64) << 32;
-    let lower = lower as i64;
+    let lower = (lower as i64) & 0xff_ff_ff_ff;
     return upper | lower;
 }
