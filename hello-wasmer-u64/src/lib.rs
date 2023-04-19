@@ -110,7 +110,8 @@ pub fn test_add_i64() -> String {
 }
 
 fn create_store() -> Store {
-    Store::new()
+    // Store::new()
+    Store::new(Engine::default())
 }
 
 fn create_instance(store: &mut Store) -> Instance {
