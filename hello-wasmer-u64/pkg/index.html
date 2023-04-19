@@ -11,6 +11,7 @@
         test_add_i32,
         test_add_i64,
         test_is_even_i64,
+        test_combine_to_i64,
       } from "/hello_wasmer_u64.js";
 
       init().then(() => {
@@ -37,8 +38,33 @@
           try {
             alert(`${num} is ${test_is_even_i64(num) ? "even" : "odd"}`);
           } catch (ex) {
-            alert(`Failed to test id ${num} is even, check the console`);
+            alert(`Failed to test if ${num} is even, check the console`);
             console.error(ex);
+          }
+        }
+
+        const numbers_to_combine = [
+          0n,
+          1n,
+          -1n,
+          2_000_000_000n,
+          -2_000_000_000n,
+        ];
+        for (const upper of numbers_to_combine) {
+          for (const lower of numbers_to_combine) {
+            try {
+              alert(
+                `${upper} combined with ${lower} is ${test_combine_to_i64(
+                  upper,
+                  lower
+                )}`
+              );
+            } catch (ex) {
+              alert(
+                `Failed to combine ${upper} and ${lower}, check the console`
+              );
+              console.error(ex);
+            }
           }
         }
       });
