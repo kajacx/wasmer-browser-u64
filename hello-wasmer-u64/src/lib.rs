@@ -120,20 +120,16 @@ pub fn test_is_even_i64(value: i64) -> bool {
 
 #[wasm_bindgen]
 pub fn test_combine_to_i64(upper: i32, lower: i32) -> i64 {
-    console_error_panic_hook::set_once();
+    let (mut store, instance) = instantiate();
 
-    return (upper as i64 * 0x1_00_00_00_00) + lower as i64;
+    let combine_to_i64 = instance
+        .exports
+        .get_typed_function::<(i32, i32), i64>(&store, "combine_to_i64")
+        .expect("should get combine_to_i64 export");
 
-    // let (mut store, instance) = instantiate();
-
-    // let combine_to_i64 = instance
-    //     .exports
-    //     .get_typed_function::<(i32, i32), i64>(&store, "combine_to_i64")
-    //     .expect("should get combine_to_i64 export");
-
-    // combine_to_i64
-    //     .call(&mut store, upper, lower)
-    //     .expect("should call combine_to_i64")
+    combine_to_i64
+        .call(&mut store, upper, lower)
+        .expect("should call combine_to_i64")
 }
 
 fn instantiate() -> (Store, Instance) {
