@@ -122,9 +122,7 @@ pub fn test_is_even_i64(value: i64) -> bool {
 pub fn test_combine_to_i64(upper: i32, lower: i32) -> i64 {
     console_error_panic_hook::set_once();
 
-    let upper = (upper as i64) << 32;
-    let lower = (lower as i64) & 0xff_ff_ff_ff;
-    return upper | lower;
+    return (upper as i64 * 0x1_00_00_00_00) + lower as i64;
 
     // let (mut store, instance) = instantiate();
 
