@@ -12,9 +12,16 @@
         test_add_i64,
         test_is_even_i64,
         test_combine_to_i64,
+        test_bigint,
       } from "/hello_wasmer_u64.js";
 
       init().then(() => {
+        try {
+          console.log(test_bigint());
+        } catch (ex) {
+          console.error(ex);
+        }
+
         console.log(test_add_i32());
         try {
           console.log(test_add_i64());
@@ -31,8 +38,12 @@
           -1n,
           2_000_000_000n,
           -2_000_000_000n,
+          2_000_000_001n,
+          -2_000_000_001n,
           8_000_000_000_000_000_000n,
           -8_000_000_000_000_000_000n,
+          8_000_000_000_000_000_001n,
+          -8_000_000_000_000_000_001n,
         ];
         for (const num of numbers_to_check) {
           try {

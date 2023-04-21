@@ -1,3 +1,4 @@
+use js_sys::BigInt;
 use std::fmt::Write;
 use wasm_bindgen::prelude::*;
 use wasmer::*;
@@ -130,6 +131,21 @@ pub fn test_combine_to_i64(upper: i32, lower: i32) -> i64 {
     combine_to_i64
         .call(&mut store, upper, lower)
         .expect("should call combine_to_i64")
+}
+
+#[wasm_bindgen]
+pub fn test_bigint() -> String {
+    console_error_panic_hook::set_once();
+
+    // let js_val = JsValue::bigint_from_str("-8000000000000000000");
+    let js_val = JsValue::from_f64(46000000000000000.);
+    let positive_value = BigInt::new(&js_val).expect("should create bigint");
+
+    // positive_value.
+    // let value: i64 = js_val.try_into().expect("should convert");
+    let value = js_val.as_f64().expect("pls");
+    // let value: u128 = positive_value.try_into().expect("should convert");
+    value.to_string()
 }
 
 fn instantiate() -> (Store, Instance) {
