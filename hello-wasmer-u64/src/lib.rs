@@ -1,164 +1,54 @@
-use js_sys::BigInt;
-use std::fmt::Write;
 use wasm_bindgen::prelude::*;
 use wasmer::*;
 
-const PLUGIN_BYTES: &'static [u8] =
-    include_bytes!("../../simple-plugin/target/wasm32-unknown-unknown/debug/simple_plugin.wasm");
-
 #[wasm_bindgen]
-extern "C" {
-    pub fn alert(s: &str);
-}
+pub fn test_add_three_i64() {
+    console_error_panic_hook::set_once();
 
-#[wasm_bindgen]
-pub fn test_add_i32() -> String {
-    let (mut store, instance) = instantiate();
-
-    let add_i32 = instance
-        .exports
-        .get_typed_function::<(i32, i32), i32>(&store, "add_i32")
-        .expect("should get add_i32 export");
-
-    let pairs = [
-        (5, 10),
-        (5, -10),
-        (i32::MAX - 5, 10),
-        (i32::MIN + 5, -10),
-        (-5, 10),
-        (-5, -10),
-        (i32::MAX - 15, 10),
-        (i32::MIN + 15, -10),
-    ];
-
-    let mut result_text = String::new();
-    for (a, b) in pairs {
-        let wasm_result = add_i32.call(&mut store, a, b).expect("should call add_i32");
-        let compare_result = a.wrapping_add(b);
-
-        if wasm_result == compare_result {
-            write!(result_text, "OK: {} + {} = {}\n", a, b, compare_result)
-                .expect("writing to string is infallible");
-        } else {
-            write!(
-                result_text,
-                "ERR: {} + {} should be {}, but got {} instead\n",
-                a, b, compare_result, wasm_result
+    let (mut store, instance) = instantiate(
+        r#"(module
+            (func $add_one_i64 (import "host" "add_one_i64") (param i64) (result i64))
+            (func (export "add_three_i64") (param i64) (result i64)
+                (i64.add (call $add_one_i64 (i64.add (local.get 0) (i64.const 1))) (i64.const 1))
             )
-            .expect("writing to string is infallible");
-        }
-    }
-    result_text
-}
-
-#[wasm_bindgen]
-pub fn test_add_i64() -> String {
-    let (mut store, instance) = instantiate();
-
-    let add_i64 = instance
-        .exports
-        .get_typed_function::<(i64, i64), i64>(&store, "add_i64")
-        .expect("should get add_i64 export");
-
-    let pairs = [
-        (5, 10),
-        (5, -10),
-        (i64::MAX - 5, 10),
-        (i64::MIN + 5, -10),
-        (-5, 10),
-        (-5, -10),
-        (i64::MAX - 15, 10),
-        (i64::MIN + 15, -10),
-    ];
-
-    let mut result_text = String::new();
-    for (a, b) in pairs {
-        let wasm_result = add_i64.call(&mut store, a, b);
-        let compare_result = a.wrapping_add(b);
-
-        let wasm_result = match wasm_result {
-            Ok(value) => value,
-            Err(err) => {
-                write!(
-                    result_text,
-                    "ERR: calling {} + {} should give {}, but it gave error instead:\n{:?}\n\n",
-                    a, b, compare_result, err
-                )
-                .expect("writing to string is infallible");
-                continue;
+        )"#,
+        |store| {
+            imports! {
+                "host" => {
+                    "add_one_i64" => Function::new_typed(store, |value: i64| value.wrapping_add(1)),
+                },
             }
-        };
+        },
+    );
 
-        if wasm_result == compare_result {
-            write!(result_text, "OK: {} + {} = {}\n", a, b, compare_result)
-                .expect("writing to string is infallible");
-        } else {
-            write!(
-                result_text,
-                "ERR: {} + {} should be {}, but got {} instead\n",
-                a, b, compare_result, wasm_result
-            )
-            .expect("writing to string is infallible");
-        }
+    let add_three_i64 = instance
+        .exports
+        .get_typed_function::<i64, i64>(&store, "add_three_i64")
+        .expect("should get add_three_i64 export");
+
+    let mut numbers = Vec::<i64>::new();
+    numbers.extend(-4..=4);
+    numbers.extend((i64::MAX - 4)..=i64::MAX);
+    numbers.extend((i64::MIN)..=(i64::MIN + 4));
+
+    for number in numbers {
+        let wasm_result = add_three_i64
+            .call(&mut store, number)
+            .expect("should call add_three_i64");
+        let compare_result = number.wrapping_add(3);
+
+        assert_eq!(wasm_result, compare_result)
     }
-    result_text
 }
 
-#[wasm_bindgen]
-pub fn test_is_even_i64(value: i64) -> bool {
-    let (mut store, instance) = instantiate();
-
-    let is_even_i64 = instance
-        .exports
-        .get_typed_function::<i64, u8>(&store, "is_even_i64")
-        .expect("should get is_even_i64 export");
-
-    is_even_i64
-        .call(&mut store, value)
-        .expect("should call is_even_i64")
-        != 0
-}
-
-#[wasm_bindgen]
-pub fn test_combine_to_i64(upper: i32, lower: i32) -> i64 {
-    let (mut store, instance) = instantiate();
-
-    let combine_to_i64 = instance
-        .exports
-        .get_typed_function::<(i32, i32), i64>(&store, "combine_to_i64")
-        .expect("should get combine_to_i64 export");
-
-    combine_to_i64
-        .call(&mut store, upper, lower)
-        .expect("should call combine_to_i64")
-}
-
-#[wasm_bindgen]
-pub fn test_bigint() -> String {
-    console_error_panic_hook::set_once();
-
-    // let js_val = JsValue::bigint_from_str("-8000000000000000000");
-    let js_val = JsValue::from_f64(46000000000000000.);
-    let positive_value = BigInt::new(&js_val).expect("should create bigint");
-
-    // positive_value.
-    // let value: i64 = js_val.try_into().expect("should convert");
-    let value = js_val.as_f64().expect("pls");
-    // let value: u128 = positive_value.try_into().expect("should convert");
-    value.to_string()
-}
-
-fn instantiate() -> (Store, Instance) {
-    console_error_panic_hook::set_once();
-
+fn instantiate(module: &str, imports: impl FnOnce(&mut Store) -> Imports) -> (Store, Instance) {
     // let mut store = Store::new()
     let mut store = Store::default();
 
-    let module = Module::new(&store, PLUGIN_BYTES).expect("should load module");
+    let module = Module::new(&store, module).expect("should load module");
 
-    let import_object = imports! {};
-    let instance =
-        Instance::new(&mut store, &module, &import_object).expect("should create instance");
+    let imports = imports(&mut store);
+    let instance = Instance::new(&mut store, &module, &imports).expect("should create instance");
 
     (store, instance)
 }

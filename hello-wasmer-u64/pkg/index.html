@@ -7,73 +7,14 @@
   </head>
   <body>
     <script type="module">
-      import init, {
-        test_add_i32,
-        test_add_i64,
-        test_is_even_i64,
-        test_combine_to_i64,
-        test_bigint,
-      } from "/hello_wasmer_u64.js";
+      import init, { test_add_three_i64 } from "/hello_wasmer_u64.js";
 
       init().then(() => {
         try {
-          console.log(test_bigint());
+          test_add_three_i64();
+          alert("SUCCESS");
         } catch (ex) {
-          console.error(ex);
-        }
-
-        console.log(test_add_i32());
-        try {
-          console.log(test_add_i64());
-        } catch (ex) {
-          console.log(
-            "Oh no, calling 'test_add_i64' crashed, see the console for more info"
-          );
-          console.error(ex);
-        }
-
-        const numbers_to_check = [
-          0n,
-          1n,
-          -1n,
-          2_000_000_000n,
-          -2_000_000_000n,
-          2_000_000_001n,
-          -2_000_000_001n,
-          8_000_000_000_000_000_000n,
-          -8_000_000_000_000_000_000n,
-          8_000_000_000_000_000_001n,
-          -8_000_000_000_000_000_001n,
-        ];
-        for (const num of numbers_to_check) {
-          try {
-            console.log(`${num} is ${test_is_even_i64(num) ? "even" : "odd"}`);
-          } catch (ex) {
-            console.log(`Failed to test if ${num} is even, check the console`);
-            console.error(ex);
-          }
-        }
-
-        const numbers_to_combine = [0, 1, -1, 2_000_000_000, -2_000_000_000];
-        for (const upper of numbers_to_combine) {
-          for (const lower of numbers_to_combine) {
-            const correctResult =
-              BigInt(upper) * 0x1_00_00_00_00n + BigInt(lower);
-
-            try {
-              const result = test_combine_to_i64(upper, lower);
-              console.log(
-                `${upper} combined with ${lower} is ${result}, should be ${correctResult}, check: ${
-                  result === correctResult
-                }`
-              );
-            } catch (ex) {
-              console.log(
-                `Failed to combine ${upper} and ${lower}, should be ${correctResult}, check the console`
-              );
-              // console.error(ex);
-            }
-          }
+          alert("ERROR");
         }
       });
     </script>
